@@ -220,7 +220,7 @@ SET exclusions = NULL
 
 where exclusions = ''
 
-# For customer_orders table#in exclusions column# for blank value
+# For customer_orders table#in exclusions column# for null value
 
 UPDATE customer_orders
 
@@ -228,7 +228,7 @@ SET exclusions = NULL
 
 where exclusions = 'null'
 
- # For customer_orders table#in extras column# null
+ # For customer_orders table#in extras column# for null
 
 UPDATE customer_orders
 
@@ -261,7 +261,7 @@ SET cancellation= NULL
 
 where  cancellation =''
 
-# For runner_orders table#in cancellation column# null
+# For runner_orders table#in cancellation column# for null
 
 UPDATE runner_orders
 
@@ -269,17 +269,146 @@ SET cancellation= NULL
 
 where cancellation ='null' 
 
-# For runner_orders table#in pickup_time column# null
-
+# For runner_orders table#in pickup_time column# for null
 
 UPDATE runner_orders
+
 SET pickup_time= NULL
+
 where pickup_time ='null'
 
- 
+# 1 How many pizzas were ordered?
+
+select count(order_id) AS total_order
+
+from customer_orders 
+
+![Screenshot 2024-06-23 194812](https://github.com/susmitagupta10/Case-Study-2---Pizza-Runner/assets/166834605/b09a09ff-36b7-49ec-96a8-0dece9f95362)
+
+
+# 2 How many unique customer orders were made?
+
+select count(distinct(order_id)) AS unique_customer
+
+from customer_orders
+
+![Screenshot 2024-06-23 194739](https://github.com/susmitagupta10/Case-Study-2---Pizza-Runner/assets/166834605/0621a1ad-317a-44b8-b2e6-8ccbffc91f23)
+
+
+# 3 How many successful orders were delivered by each runner?
+
+SELECT runner_id, count(order_id) as "Successfully delivered order"
+
+from runner_orders
+
+Where pickup_time is not Null
+
+group by runner_id
+
+![Screenshot 2024-06-23 194659](https://github.com/susmitagupta10/Case-Study-2---Pizza-Runner/assets/166834605/2c2c2d8b-2c9c-4315-b595-ae02fafeaa0c)
+
+
+# 4 How many of each type of pizza was delivered?
+
+SELECT  p.pizza_name,Count(r.order_id) as Delivered
+
+from customer_orders
+
+join runner_orders r using (order_id)
+
+join pizza_names p using (pizza_id)
+
+where r.pickup_time is not NULL
+
+group by p.pizza_name
+
+![Screenshot 2024-06-23 194551](https://github.com/susmitagupta10/Case-Study-2---Pizza-Runner/assets/166834605/3910e630-bdd8-4250-b3a3-e529461b424d)
+
+
+# 5 How many Vegetarian and Meatlovers were ordered by each customer?
 
 
 
 
 
+# 6 What was the maximum number of pizzas delivered in a single order?
 
+SELECT order_id,count(pizza_id) as Ordered
+
+from customer_orders
+
+group by order_id
+
+order by ordered desc
+
+limit 1
+
+![Screenshot 2024-06-23 194523](https://github.com/susmitagupta10/Case-Study-2---Pizza-Runner/assets/166834605/bd38bf81-0ec2-4c18-8d61-bad9b58a2b70)
+
+
+# 7 For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
+
+select customer_id, 
+
+sum(case
+
+  when (exclusions is not null and exclusions != 0) or (extras is not null and extras != 0) then 1
+  
+        else 0
+        
+        end )as AtleastOneChange,
+sum(case 
+
+  when (exclusions is null or exclusions = 0) and (extras is null or extras = 0) then 1
+  
+        else 0
+        
+        end ) as NoChange
+
+from customer_orders c
+
+inner join runner_orders r
+
+on r.order_id = c.order_id
+
+where r.distance != 0
+
+group by c.customer_id;
+
+![Screenshot 2024-06-23 194440](https://github.com/susmitagupta10/Case-Study-2---Pizza-Runner/assets/166834605/3b621369-f893-4262-aa6d-f87054817bff)
+
+
+# 8 How many pizzas were delivered that had both exclusions and extras?
+
+Select customer_id, (pizza_Id) AS "EXCLUSIONS & EXTRAS"
+
+from customer_orders c
+
+join runner_orders r using (order_id)
+
+where c.exclusions is not null and c.extras is not null
+
+and r.pickup_time is not null
+
+![Screenshot 2024-06-23 194343](https://github.com/susmitagupta10/Case-Study-2---Pizza-Runner/assets/166834605/5c9b62fe-5212-467d-ac87-3a04a120c57b)
+
+
+# 9 What was the total volume of pizzas ordered for each hour of the day?
+
+select count(pizza_id), hour (order_time) as Hourly
+
+from customer_orders
+
+group by Hourly
+
+![Screenshot 2024-06-23 194129](https://github.com/susmitagupta10/Case-Study-2---Pizza-Runner/assets/166834605/764d3a65-0e9e-4aa0-8973-6aa99c9727f8)
+
+
+# 10 What was the volume of orders for each day of the week?
+
+select count(order_id) as "Total order", weekday(order_time) as week_no,dayname(order_time)as day_name
+
+from customer_orders
+
+group by week_no,day_name
+![Screenshot 2024-06-23 194108](https://github.com/susmitagupta10/Case-Study-2---Pizza-Runner/assets/166834605/7a36b649-5d46-4be0-9dbc-e161ca2ddab1)
