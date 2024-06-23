@@ -277,6 +277,8 @@ SET pickup_time= NULL
 
 where pickup_time ='null'
 
+  # Pizza Metrics
+
 # 1 How many pizzas were ordered?
 
 select count(order_id) AS total_order
@@ -379,14 +381,14 @@ select customer_id,
 
 sum(case
 
-  when (exclusions is not null and exclusions != 0) or (extras is not null and extras != 0) then 1
+when (exclusions is not null and exclusions != 0) or (extras is not null and extras != 0) then 1
   
         else 0
         
         end )as AtleastOneChange,
 sum(case 
 
-  when (exclusions is null or exclusions = 0) and (extras is null or extras = 0) then 1
+when (exclusions is null or exclusions = 0) and (extras is null or extras = 0) then 1
   
         else 0
         
