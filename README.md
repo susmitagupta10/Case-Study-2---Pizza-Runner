@@ -327,8 +327,35 @@ group by p.pizza_name
 
 # 5 How many Vegetarian and Meatlovers were ordered by each customer?
 
+with meat_pizza as (
 
+Select count(pizza_id) as total_meat_lover, customer_id
 
+from customer_orders
+
+where pizza_id = 1
+
+group by customer_id),
+
+veg_pizza as (
+
+Select count(pizza_id) as total_vegeterian, customer_id
+
+from customer_orders 
+
+where pizza_id = 2
+
+group by customer_id)
+
+select m.customer_id, total_meat_lover,total_vegeterian
+
+from meat_pizza m, veg_pizza v
+
+group by m.customer_id,total_meat_lover,total_vegeterian
+
+order by  m.customer_id asc
+
+![Screenshot 2024-06-23 203214](https://github.com/susmitagupta10/Case-Study-2---Pizza-Runner/assets/166834605/8c81b0e0-06c7-4f28-8cfe-399fe4563f98)
 
 
 # 6 What was the maximum number of pizzas delivered in a single order?
@@ -411,4 +438,5 @@ select count(order_id) as "Total order", weekday(order_time) as week_no,dayname(
 from customer_orders
 
 group by week_no,day_name
+
 ![Screenshot 2024-06-23 194108](https://github.com/susmitagupta10/Case-Study-2---Pizza-Runner/assets/166834605/7a36b649-5d46-4be0-9dbc-e161ca2ddab1)
